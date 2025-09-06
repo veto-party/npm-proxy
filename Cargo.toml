@@ -1,0 +1,21 @@
+[package]
+name = "proxy"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+axum = { version = "0.8.4", features = ["macros"] }
+base64 = "0.22.1"
+bytes = "1.10.1"
+futures = "0.3.31"
+http-body = "1.0.1"
+reqwest = "0.12.23"
+serde = { version = "1.0.219", features = ["derive"] }
+serde-binary = "0.5.0"
+serde_iter = "0.1.1"
+serde_json = "1.0.143"
+serde_with = "3.14.0"
+tokio = { version = "1.47.1", features = ["full"] }
+tokio-stream = "0.1.17"
+tracing = "0.1.41"
+tracing-subscriber = "0.3.20"
