@@ -1,11 +1,11 @@
 use std::{collections::HashMap, sync::Arc};
-use tokio::sync::Mutex;
+use tokio::sync::RwLock;
 
 use crate::http::api::{inner::{ApiInner, ApiInnerResult}, storage::ApiStorage};
 
 
 pub struct Api {
-    pub running_requests: Arc<Mutex<HashMap<String, ApiInnerResult>>>,
+    pub running_requests: Arc<RwLock<HashMap<String, ApiInnerResult>>>,
     pub api_inner: Box<ApiInner>,
 }
 
@@ -22,25 +22,27 @@ impl Api {
     async fn load(&mut self, uri: String) -> Result<ApiStorage, ()> {
 
         let mut created = false;
-        if !self.running_requests.lock().await.contains_key(&uri) {
-            self.running_requests.lock().await.insert(uri.clone(),self.api_inner.clone().do_load(uri.clone()));
+        let has_key = self.running_requests.read().await.contains_key(&uri);
+        if !has_key {
+            self.running_requests.write().await.insert(uri.clone(),self.api_inner.clone().do_load(uri.clone()));
             created = true;
         }
 
         let result = async {
 
-            let running = self.running_requests.lock().await;
+            let running = self.running_requests.read().await;
             let option = running.get(&uri).unwrap();
+            let result = option.call().await;
             
-            if let Ok(awiated) = option.call().await {
-                return Ok(awiated);
+            if let Ok(awiated) = result {
+                return Ok(awiated.clone());
             }
 
             return Err(());
         }.await;
 
         if created {
-            self.running_requests.lock().await.remove(&uri);
+            self.running_requests.write().await.remove(&uri);
         }
 
         return result;

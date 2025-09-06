@@ -2,6 +2,8 @@
   "name": "some-package",
   "private": true,
   "dependencies": {
-    "test": "0.0.3"
+    "baum": "^0.2.0-pre-53",
+    "test": "0.0.3",
+    "turbo": "^2.5.6"
   }
 }

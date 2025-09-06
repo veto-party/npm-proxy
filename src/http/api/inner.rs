@@ -49,33 +49,19 @@ impl Clone for ApiInner {
 impl ApiInner {
 
     fn modified(registry_uri: String, resulting_registry_uri: String, data: Vec<u8>) -> Vec<u8> {
-        let mut result: serde_json::Value = serde_json::from_slice(&data).unwrap();
-        let value = &mut result;
+        let mut datar = data.clone();
+        let mut result: serde_json::Value = simd_json::serde::from_slice(&mut datar).unwrap();
+        let value = result.as_object_mut().unwrap().get_mut(&"versions".to_string()).unwrap().as_object_mut().unwrap().values_mut();
 
-        {
-            let mut stack = vec![value];
+        for entry in value  {
 
-            while let Some(current) = stack.pop() {
-                match current {
-                    Value::String(s) => {
-                        *s = s.replace(&registry_uri, &resulting_registry_uri);
-                    }
-                    Value::Array(arr) => {
-                        for v in arr {
-                            stack.push(v);
-                        }
-                    }
-                    Value::Object(map) => {
-                        for v in map.values_mut() {
-                            stack.push(v);
-                        }
-                    }
-                    _ => {}
-                }
+            let tarball = entry.as_object_mut().unwrap().get_mut(&"dist".to_string()).unwrap().as_object_mut().unwrap().get_mut(&"tarball".to_string()).unwrap();
+            if let Value::String(s) = tarball {
+                *s = s.replace(&registry_uri, &resulting_registry_uri);
             }
         }
 
-        return serde_json::to_vec(&result).unwrap();
+        return simd_json::to_vec(&result).unwrap();
     }
 
     pub fn do_load(self, uri: String) -> ApiInnerResult  {
@@ -97,9 +83,6 @@ impl ApiInner {
                 if let Ok(val) = me.do_load_cache(&uri_clone).await {
                     return Ok(val);
                 }
-
-
-                println!("{}", uri_clone.clone());
 
                 let mut url = Url::parse(&me.registry_uri.clone()).unwrap();
                 url.set_path(&uri_clone);
