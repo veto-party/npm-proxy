@@ -20,7 +20,7 @@
       "containers": 
         
         - "name": "npm-proxy"
-          "image": "REPLACE-IMAGE"
+          "image": "ghcr.io/veto-party/npm-proxy:REPLACE-IMAGE"
           "ports": 
           
           "resources": 
