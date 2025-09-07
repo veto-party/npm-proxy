@@ -1,7 +1,7 @@
-use std::{any::Any, env};
+use std::env;
 
 use axum::{extract::Request, middleware::Next, response::Response, http::StatusCode};
-use openidconnect::{core::{CoreAuthenticationFlow, CoreClient, CoreIdToken, CoreProviderMetadata, CoreUserInfoClaims}, AccessToken, AuthorizationCode, ClientId, ClientSecret, CsrfToken, IssuerUrl, Nonce, OAuth2TokenResponse, PkceCodeChallenge, PkceCodeVerifier, RedirectUrl, Scope};
+use openidconnect::{core::{CoreAuthenticationFlow, CoreClient, CoreProviderMetadata, CoreUserInfoClaims}, AccessToken, AuthorizationCode, ClientId, ClientSecret, CsrfToken, IssuerUrl, Nonce, OAuth2TokenResponse, PkceCodeChallenge, PkceCodeVerifier, RedirectUrl, Scope};
 use reqwest::{header, Client};
 
 use crate::http::auth::user::CurrentUser;

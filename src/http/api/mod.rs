@@ -1,7 +1,7 @@
 use std::{collections::HashMap, env, path, sync::Arc};
 
 use axum::{extract::{Path, State}, routing::get, Router};
-use tokio::sync::{Mutex, RwLock};
+use tokio::sync::RwLock;
 
 use crate::http::api::{api::Api, inner::ApiInner};
 

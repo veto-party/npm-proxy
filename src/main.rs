@@ -6,7 +6,7 @@ use std::collections::HashMap;
 use axum::body::Body;
 use axum::extract::{Query, Request, State};
 use axum::middleware::Next;
-use axum::response::{IntoResponse, Redirect, Response};
+use axum::response::{IntoResponse, Redirect};
 use axum::routing::get;
 use axum::{
     middleware, Router
