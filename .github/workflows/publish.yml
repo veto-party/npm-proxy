@@ -55,7 +55,5 @@ jobs:
               run: sed -i "s|REPLACE-IMAGE|${{ github.event.release.tag_name }}|g" helm/templates/deployment.yaml
             - name: Run chart-releaser
               uses: helm/chart-releaser-action@v1
-              with:
-                charts_dir: helm
               env:
                 CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
