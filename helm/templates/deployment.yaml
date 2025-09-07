@@ -20,7 +20,7 @@
       "containers": 
         
         - "name": "npm-proxy"
-          "image": "some-package-image"
+          "image": "REPLACE-IMAGE"
           "ports": 
           
           "resources": 
