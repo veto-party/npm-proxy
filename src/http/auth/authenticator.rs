@@ -28,7 +28,7 @@ impl Authenticator {
             ClientId::new(env::var("OIDC_CLIENT_ID").unwrap_or("5886b8495ece1e656e033bbb9c3aeb19e4f6175453fe40609ab7a34abed94bb5".to_string())),
             Some(ClientSecret::new(env::var("OIDC_CLIENT_SECRET").unwrap_or("gloas-0660c3c0f9289c4878a01e5a16b8a9796af5fee840ab6bacf85b379645816075".to_string()))),
         )
-        .set_redirect_uri(RedirectUrl::new(env::var("OIDC_REDIRECT_URL").unwrap_or("http://localhost:5000".to_string())).unwrap());
+        .set_redirect_uri(RedirectUrl::new(env::var("OIDC_REDIRECT_URL").unwrap_or("http://localhost:5000/".to_string())).unwrap());
 
         return Authenticator {
             http_client:  http_client,
@@ -36,10 +36,10 @@ impl Authenticator {
         }
     }
     
-    pub fn get_redirect_url(&self) -> (reqwest::Url, CsrfToken, Nonce) {
-        let (pkce_challenge, _pkce_verifier) = PkceCodeChallenge::new_random_sha256();
+    pub fn get_redirect_url(&self) -> (PkceCodeVerifier, (reqwest::Url, CsrfToken, Nonce)) {
+        let (pkce_challenge, pkce_verifier) = PkceCodeChallenge::new_random_sha256();
 
-        return self.client
+        return (pkce_verifier, self.client
             .authorize_url(
                 CoreAuthenticationFlow::AuthorizationCode,
                 CsrfToken::new_random,
@@ -49,18 +49,18 @@ impl Authenticator {
             .add_scope(Scope::new("openid".to_string()))
             .add_scope(Scope::new("profile".to_string()))
             // Set the PKCE code challenge.
-            .set_pkce_challenge(pkce_challenge)
-            .url();
+            //.set_pkce_challenge(pkce_challenge)
+            .url());
     }
 
     pub async fn get_from_redirected(&self, token: String, csrf: String) -> AccessToken {
 
-        let pkce_verifier = PkceCodeVerifier::new(csrf);
+        // let pkce_verifier = PkceCodeVerifier::new(csrf);
 
         let token_response =self.client
         .exchange_code(AuthorizationCode::new(token)).unwrap()
         // Set the PKCE code verifier.
-        .set_pkce_verifier(pkce_verifier)
+        // .set_pkce_verifier(pkce_verifier)
         .request_async(&self.http_client).await.unwrap();
 
         return token_response.access_token().clone();
@@ -83,13 +83,20 @@ impl Authenticator {
     }
 
     pub async fn middleware(&self, mut req: Request, next: Next) -> Result<Response, StatusCode> {
-        let auth_header = req
+        let mut auth_header = req
                 .headers()
                 .get(header::AUTHORIZATION)
                 .and_then(|header| header.to_str().ok())
-                .ok_or(StatusCode::UNAUTHORIZED)?;
+                .ok_or(StatusCode::UNAUTHORIZED)?
+                .to_string();
 
-            if let Some(user) = self.authorize(auth_header).await {
+            if auth_header.starts_with("Bearer")  {
+                auth_header = auth_header.strip_prefix("Bearer").unwrap_or(&auth_header).to_string();
+            }
+
+            auth_header = auth_header.trim().to_string();
+
+            if let Some(user) = self.authorize(&auth_header).await {
                 req.extensions_mut().insert(user);
                 return Ok(next.run(req).await);
             }

@@ -26,7 +26,6 @@ async fn main() {
     let app = api_routes(Router::new())
         .route("/", get(|State(state): State<Authenticator>, Query(params):Query<HashMap<String, String>>, jar: CookieJar| async move {
             if params.contains_key("code") {
-
                 let result = Body::new(state.get_from_redirected(params.get("code").unwrap().clone(), jar.get("_csrf").unwrap().to_string()).await.secret().to_string()).into_response();
                 return (
                     jar,
@@ -35,8 +34,7 @@ async fn main() {
             }
 
 
-            let (url, token, _) = state.get_redirect_url();
-
+            let (token, (url, _, _)) = state.get_redirect_url();
             return (
                 jar.add(Cookie::new("_csrf", token.secret().clone())), 
                 Redirect::temporary(&url.as_str().to_string()).into_response()
