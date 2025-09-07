@@ -19,6 +19,9 @@ use crate::http::auth::authenticator::Authenticator;
 
 #[tokio::main]
 async fn main() {
+
+    dotenv::dotenv().ok();
+
     let auth = Authenticator::create().await;
     let app = api_routes(Router::new())
         .route("/", get(|State(state): State<Authenticator>, Query(params):Query<HashMap<String, String>>, jar: CookieJar| async move {

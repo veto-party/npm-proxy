@@ -8,6 +8,7 @@ axum = { version = "0.8.4", features = ["macros"] }
 axum-extra = { version = "0.10.1", features = ["cookie"] }
 base64 = "0.22.1"
 bytes = "1.10.1"
+dotenv = "0.15.0"
 futures = "0.3.31"
 openidconnect = "4.0.1"
 reqwest = "0.12.23"
