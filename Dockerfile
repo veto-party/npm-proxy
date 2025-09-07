@@ -1,17 +1,8 @@
 
 FROM rust:1.89 AS builder
 
-RUN cd / && \
-    cargo new playground
-WORKDIR /playground
-
-ADD Cargo.toml /playground/Cargo.toml
-
-RUN cargo build --release
-
-WORKDIR /usr/src/PROJ
-
 WORKDIR /usr/src/npm-proxy
+
 COPY . .
 RUN cargo install --path .
 
