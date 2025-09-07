@@ -1,0 +1,36 @@
+"apiVersion": "apps/v1"
+"kind": "deployment"
+"metadata": 
+  "name": "npm-proxy"
+  
+"spec": 
+  "replicas": 1
+  "selector": 
+    "matchLabels": 
+      "app": "npm-proxy"
+      
+    
+  "template": 
+    "metadata": 
+      "labels": 
+        "app": "npm-proxy"
+        
+      
+    "spec": 
+      "containers": 
+        
+        - "name": "npm-proxy"
+          "image": "some-package-image"
+          "ports": 
+          
+          "resources": 
+          
+          "nodeSelector": 
+            "label": "npm-proxy"
+            
+          "envFrom":
+          - "configMapRef":
+              "name": "npm-proxy-config"
+          - "secretRef":
+              "name": "npm-proxy-secret"
+            
