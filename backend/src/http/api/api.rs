@@ -58,10 +58,6 @@ impl Api {
 
         let mut dir =result.unwrap();
 
-//         while let Some(entry) = entries.next_entry().await? {
-//     println!("{:?}", entry.path());
-// }
-
         let mut vec: Vec<String> = Vec::new();
 
         while let Some(file) = dir.next_entry().await.unwrap() {

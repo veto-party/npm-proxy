@@ -15,7 +15,7 @@ export const AllPackagesLoader: FunctionComponent = () => {
         }
     }, []));
 
-    return <div className="flex flex-row">
+    return <div className="flex flex-col gap-y-6">
         {packages?.map((packageName) => (
             <ConfirmDeleteButton key={packageName} packageName={packageName}/>
         ))}
