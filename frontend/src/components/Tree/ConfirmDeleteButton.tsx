@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useState, type FunctionComponent, type MouseEvent, type PointerEvent } from "react";
-import { client } from "../api";
+import { client } from "../../api";
 
 type ConfirmDeleteButtonProps = {
     packageName: string;
