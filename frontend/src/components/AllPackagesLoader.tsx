@@ -37,14 +37,30 @@ export const AllPackagesLoader: FunctionComponent = () => {
             return [];
         }
 
+        const counters: Record<string, number> = {};
         const results: Record<string, string[]> = {};
+
         for (const pkgName of packages) {
+
+            results[pkgName] ??= [];
+
             for (const subPkgName of packages) {
-                if (subPkgName.startsWith(pkgName)) {
-                    results[pkgName] ??= [];
-                    results[pkgName].push(subPkgName);
+                if (!subPkgName.startsWith(pkgName)) {
+                    continue;
                 }
+
+                const sub = subPkgName.substring(pkgName.length);
+                if (!sub.startsWith('/') && !sub.startsWith(encodeURI('/'))) {
+                    continue;
+                }
+
+                results[pkgName].push(subPkgName);
+                counters[subPkgName]++;
             }
+        }
+
+        for (const key in counters) {
+            delete results[key];
         }
 
         return Object.entries(results);
@@ -52,9 +68,9 @@ export const AllPackagesLoader: FunctionComponent = () => {
 
     return <div className="flex flex-col gap-y-6">
         <input value={search} onChange={e => setSearch(e.target.value)} type="text" placeholder="filter packages..." />
-        {packageGroups.map(([pgkName, metadatas]) => (
-            <TreeNode packageName={pgkName}>
-                {metadatas.map((packageName) => <ConfirmDeleteButton key={packageName} packageName={packageName}/>)}
+        {packageGroups.sort(([a], [b]) => a.localeCompare(b)).map(([pgkName, metadatas]) => (
+            <TreeNode packageName={pgkName} packageNames={metadatas}>
+                {metadatas.sort().map((packageName) => <ConfirmDeleteButton key={packageName} packageName={packageName}/>)}
             </TreeNode>
         ))}
     </div>

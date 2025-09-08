@@ -1,5 +1,6 @@
 import { useCallback, useMemo, useState, type FunctionComponent, type MouseEvent, type PointerEvent } from "react";
 import { client } from "../../api";
+import { useFastDelete } from "../../hook/useFastDelete";
 
 type ConfirmDeleteButtonProps = {
     packageName: string;
@@ -9,21 +10,9 @@ export const ConfirmDeleteButton: FunctionComponent<ConfirmDeleteButtonProps> = 
     packageName
 }) => {
 
-    const [removed, setRemoved] = useState(false);
-    const [showDetails, setShowDetails] = useState(false);
-    const doDelete = useCallback(async () => {
-        await client.delete(`/-/api/delete/${encodeURIComponent(packageName)}`);
-        setRemoved(true);
-    }, []);
-
-    const onClick = useCallback((event: MouseEvent) => {
-        if (event.shiftKey) {
-            doDelete();
-            return;
-        }
-
-        setShowDetails(true);
-    }, [ packageName ]);
+   const [details, onClick, removed] = useFastDelete(useCallback(async () => {
+        await client.delete(`/-/api/delete/${packageName}`);
+    }, [ packageName ]));
 
     const realPackageName = useMemo(() => decodeURIComponent(packageName), [ packageName ]);
 
@@ -31,10 +20,8 @@ export const ConfirmDeleteButton: FunctionComponent<ConfirmDeleteButtonProps> = 
         return null;
     }
 
-    return <div className="bg-gray-500 rounded-xl">
+    return <div className="bg-gray-500 rounded-xl px-2">
         <button type="button" onClick={onClick}>{realPackageName}</button>
-        {showDetails && (
-            <button type="button" onClick={doDelete}>Delete now {realPackageName}!</button>
-        )}
+        {details}
     </div>
 }
