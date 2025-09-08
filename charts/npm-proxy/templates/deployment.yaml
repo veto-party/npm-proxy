@@ -21,7 +21,8 @@
         
         - "name": "npm-proxy"
           "image": "ghcr.io/veto-party/npm-proxy:REPLACE-IMAGE"
-          "ports": 
+          "ports":
+            - 5000      
           
           "resources": 
           
