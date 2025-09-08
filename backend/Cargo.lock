@@ -1633,6 +1633,7 @@ dependencies = [
  "simd-json",
  "tokio",
  "tokio-stream",
+ "tower-http",
  "tracing",
  "tracing-subscriber",
  "urlencoding",

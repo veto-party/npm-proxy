@@ -4,4 +4,17 @@ import react from '@vitejs/plugin-react'
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react()],
+  server: {
+    proxy: {
+      "/api/": {
+        target: 'http://localhost:5000',
+        //autoRewrite: true,
+        // headers: {
+        //   "": ""
+        // }, 
+        hostRewrite: "localhost:3571",
+        changeOrigin: false
+      }
+    }
+  }
 })

@@ -7,6 +7,7 @@ use std::collections::HashMap;
 
 use axum::body::Body;
 use axum::extract::{Query, Request, State};
+use axum::http::{HeaderValue, Response};
 use axum::middleware::Next;
 use axum::response::{IntoResponse, Redirect};
 use axum::routing::get;
@@ -15,6 +16,7 @@ use axum::{
 };
 use axum_extra::extract::cookie::Cookie;
 use axum_extra::extract::CookieJar;
+use tower_http::cors::{Any, CorsLayer};
 
 use crate::http::api::api_routes;
 use crate::http::auth::api::{self, AuthenticatorApi};
@@ -32,6 +34,11 @@ async fn main() {
     let redis = redis::Client::open(conf.redis_uri.clone()).unwrap();
 
     let api = AuthenticatorApi::new(conf.self_url.clone(), redis, auth.clone());
+
+    let cors = CorsLayer::new()
+        .allow_methods(Any)
+        .allow_origin(Any)
+        .allow_headers(Any);
 
     let app = api.routes(api_routes(Router::new(), &conf))
         .route("/", get(|State((auth, api)): State<(Authenticator, AuthenticatorApi)>, Query(params):Query<HashMap<String, String>>, jar: CookieJar| async move {
@@ -58,10 +65,12 @@ async fn main() {
         }).with_state((auth.clone(), api.clone())))
         .route_layer(middleware::from_fn_with_state(auth.clone(), |State(state): State<Authenticator>, req: Request, next: Next| async move  {
             if req.uri().path().eq("/") ||  req.uri().path().eq("/-/v1/login") || req.uri().path().starts_with("/login") || req.uri().path().starts_with("/check_done") {
-                return Ok(next.run(req).await);
+                let respsonse = next.run(req).await;
+                return Ok(respsonse);
             }
-            return state.middleware(req, next).await;
-        }));
+            let result = state.middleware(req, next).await;            
+            return result;
+        })).route_layer(cors);
 
     let listener = tokio::net::TcpListener::bind("0.0.0.0:5000").await.unwrap();
     axum::serve(listener, app).await.unwrap();

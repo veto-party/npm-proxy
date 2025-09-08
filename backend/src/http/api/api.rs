@@ -1,5 +1,6 @@
 use std::{collections::HashMap, sync::Arc};
-use tokio::sync::RwLock;
+use base64::{prelude::BASE64_STANDARD, Engine};
+use tokio::{fs, sync::RwLock};
 
 use crate::http::api::{inner::{ApiInner, ApiInnerResult}, storage::ApiStorage};
 
@@ -46,6 +47,41 @@ impl Api {
         }
 
         return result;
+    }
+
+    pub async fn get_cached_packages(&self) -> Vec<String> {
+        let result = fs::read_dir(self.api_inner.cache.clone()).await;
+
+        if result.is_err() {
+            return Vec::new();
+        }
+
+        let mut dir =result.unwrap();
+
+//         while let Some(entry) = entries.next_entry().await? {
+//     println!("{:?}", entry.path());
+// }
+
+        let mut vec: Vec<String> = Vec::new();
+
+        while let Some(file) = dir.next_entry().await.unwrap() {
+            if file.file_type().await.unwrap().is_dir() {
+                continue;
+            }
+
+            if let Ok(result) = BASE64_STANDARD.decode(file.file_name().to_str().unwrap().to_string().strip_suffix(".bin").unwrap().to_string()) {
+                vec.push(String::from_utf8(result).unwrap());
+            }
+        }
+
+        return vec;
+    }
+
+    pub async fn delete_cached_file(&self, package_name: String) {
+        let mut path = self.api_inner.cache.clone();
+        path.push(BASE64_STANDARD.encode(package_name) + ".bin");
+
+        fs::remove_file(path).await;
     }
 
     pub async fn get_package_metadata(&mut self, package_name: String) -> Result<ApiStorage, ()> {

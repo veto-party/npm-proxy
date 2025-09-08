@@ -1,6 +1,7 @@
 use std::{collections::HashMap, env, path, sync::Arc};
 
-use axum::{extract::{Path, State}, routing::get, Router};
+use axum::{extract::{Path, State}, routing::{delete, get}, Json, Router};
+use serde_json::json;
 use tokio::sync::RwLock;
 
 use crate::{config::Config, http::api::{api::Api, inner::ApiInner}};
@@ -41,6 +42,14 @@ pub fn api_routes(router: Router, config: &Config) -> Router {
                 api.api.get_dist_tags(package_name).await
             }
         ).with_state(api_state.clone()))
+        .route("/-/api/all", get(|State(api): State<ApiState>| async move {
+                Json(json!(api.api.get_cached_packages().await))
+            }
+        ).with_state(api_state.clone()))
+        .route("/-/api/delete/{package_name}", delete(|Path(package_name): Path<String>, State(api): State<ApiState>| async move {
+            api.api.delete_cached_file(package_name).await;
+            return Json("{}");
+        }).with_state(api_state.clone()))
         .route("/{package_name}/-/{file_name}", get(
             |Path((package_name, file_name)): Path<(String, String)>, State(mut api): State<ApiState>| async move {
                 api.api.get_file(package_name, file_name).await
