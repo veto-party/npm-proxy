@@ -1,48 +1,51 @@
 use std::env;
 
-use axum::{extract::Request, middleware::Next, response::Response, http::StatusCode};
+use axum::{extract::Request, http::StatusCode, middleware::Next, response::Response, routing::get, Router};
 use openidconnect::{core::{CoreAuthenticationFlow, CoreClient, CoreProviderMetadata, CoreUserInfoClaims}, AccessToken, AuthorizationCode, ClientId, ClientSecret, CsrfToken, IssuerUrl, Nonce, OAuth2TokenResponse, PkceCodeChallenge, PkceCodeVerifier, RedirectUrl, Scope};
 use reqwest::{header, Client};
+use serde::{Deserialize, Serialize};
 
-use crate::http::auth::user::CurrentUser;
+use crate::{config::Config, http::auth::user::CurrentUser};
 
 
 #[derive(Clone)]
 pub struct Authenticator {
     http_client: Client,
     client:  openidconnect::Client<openidconnect::EmptyAdditionalClaims, openidconnect::core::CoreAuthDisplay, openidconnect::core::CoreGenderClaim, openidconnect::core::CoreJweContentEncryptionAlgorithm, openidconnect::core::CoreJsonWebKey, openidconnect::core::CoreAuthPrompt, openidconnect::StandardErrorResponse<openidconnect::core::CoreErrorResponseType>, openidconnect::StandardTokenResponse<openidconnect::IdTokenFields<openidconnect::EmptyAdditionalClaims, openidconnect::EmptyExtraTokenFields, openidconnect::core::CoreGenderClaim, openidconnect::core::CoreJweContentEncryptionAlgorithm, openidconnect::core::CoreJwsSigningAlgorithm>, openidconnect::core::CoreTokenType>, openidconnect::StandardTokenIntrospectionResponse<openidconnect::EmptyExtraTokenFields, openidconnect::core::CoreTokenType>, openidconnect::core::CoreRevocableToken, openidconnect::StandardErrorResponse<openidconnect::RevocationErrorResponseType>, openidconnect::EndpointSet, openidconnect::EndpointNotSet, openidconnect::EndpointNotSet, openidconnect::EndpointNotSet, openidconnect::EndpointMaybeSet, openidconnect::EndpointMaybeSet>,
+    self_url: String
 }
 
 impl Authenticator {
 
-    pub async fn create() -> Authenticator {
+    pub async fn create(config: &Config) -> Self {
         let http_client = Client::builder().redirect(reqwest::redirect::Policy::none()).build().unwrap();
         let provider_metadata = CoreProviderMetadata::discover_async(
-            IssuerUrl::new( env::var("OIDC_ISSUER_URL").unwrap_or("https://gitlab.git.veto.dev".to_string())).unwrap(),
+            IssuerUrl::new(config.oidc_url.clone()).unwrap(),
             &http_client
         ).await.unwrap();
 
         let client=
             CoreClient::from_provider_metadata(
             provider_metadata,
-            ClientId::new(env::var("OIDC_CLIENT_ID").unwrap_or("5886b8495ece1e656e033bbb9c3aeb19e4f6175453fe40609ab7a34abed94bb5".to_string())),
-            Some(ClientSecret::new(env::var("OIDC_CLIENT_SECRET").unwrap_or("gloas-0660c3c0f9289c4878a01e5a16b8a9796af5fee840ab6bacf85b379645816075".to_string()))),
+            ClientId::new(config.oidc_client_secret.clone()),
+            Some(ClientSecret::new(config.oidc_client_id.clone())),
         )
         .set_redirect_uri(RedirectUrl::new(env::var("OIDC_REDIRECT_URL").unwrap_or("http://localhost:5000/".to_string())).unwrap());
 
         return Authenticator {
             http_client:  http_client,
-            client: client
+            client: client,
+            self_url: config.self_url.clone(),
         }
     }
     
-    pub fn get_redirect_url(&self) -> (PkceCodeVerifier, (reqwest::Url, CsrfToken, Nonce)) {
+    pub fn get_redirect_url(&self, state: String) -> (PkceCodeVerifier, (reqwest::Url, CsrfToken, Nonce)) {
         let (pkce_challenge, pkce_verifier) = PkceCodeChallenge::new_random_sha256();
 
         return (pkce_verifier, self.client
             .authorize_url(
                 CoreAuthenticationFlow::AuthorizationCode,
-                CsrfToken::new_random,
+                || {CsrfToken::new(state)},
                 Nonce::new_random,
             )
             // Set the desired scopes.
@@ -103,5 +106,4 @@ impl Authenticator {
 
         return Err(StatusCode::UNAUTHORIZED);
     }
-    
 }

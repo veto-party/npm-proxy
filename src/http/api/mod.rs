@@ -3,7 +3,7 @@ use std::{collections::HashMap, env, path, sync::Arc};
 use axum::{extract::{Path, State}, routing::get, Router};
 use tokio::sync::RwLock;
 
-use crate::http::api::{api::Api, inner::ApiInner};
+use crate::{config::Config, http::api::{api::Api, inner::ApiInner}};
 
 mod api;
 mod inner;
@@ -16,15 +16,14 @@ struct ApiState {
     api: Api
 }
 
-pub fn api_routes(router: Router) -> Router {
+pub fn api_routes(router: Router, config: &Config) -> Router {
 
     let cache = path::absolute("./cache/".to_string()).unwrap();
 
-
     let api = Api {
         api_inner: Box::new(ApiInner { 
-            registry_uri: env::var("PROXY_REGISTRY_URI").unwrap_or("https://registry.npmjs.org/".to_string()),
-            resulting_registry_uri: env::var("PROXY_REGISTRY_HOST").unwrap_or("http://localhost:5000/".to_string()),
+            registry_uri: config.registry_url.clone(),
+            resulting_registry_uri: config.self_url.clone(),
             cache: cache
         }),
         // stored_responses: Arc::new(RwLock::new(HashMap::new())),

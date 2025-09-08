@@ -12,12 +12,16 @@ jobs:
     publish:
         runs-on: ubuntu-latest
         permissions:
-            contents: read
+            contents: write
             packages: write
             id-token: write
         steps:
             - name: Checkout repository
               uses: actions/checkout@v5
+            - name: Configure Git
+              run: |
+                git config user.name "$GITHUB_ACTOR"
+                git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
             - name: Install cosign
               if: github.event_name != 'pull_request'
               uses: sigstore/cosign-installer@v3
