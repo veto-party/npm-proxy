@@ -1,16 +1,16 @@
-"apiVersion": "v1"
-"kind": "Service"
-"metadata": 
-  "name": "npm-registry-service"
+apiVersion: v1
+kind: Service
+metadata: 
+  name: npm-registry-service
   
-"spec": 
-  "selector": 
-    "name": "npm-registry-deployment"
+spec: 
+  selector: 
+    name: npm-registry-deployment
     
-  "type": "ClusterIP"
-  "ports": 
+  type: ClusterIP
+  ports: 
     
-    - "name": "npm-registry-5000"
-      "protocol": "TCP"
-      "port": 5000
-      "targetPort": 5000
+    - name: npm-registry-5000
+      protocol: TCP
+      port: 5000
+      targetPort: 5000

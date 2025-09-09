@@ -1,9 +1,9 @@
-"apiVersion": "v1"
-"kind": "ConfigMap"
-"metadata": 
-  "name": "npm-proxy-config"
+apiVersion: v1
+kind: ConfigMap
+metadata: 
+  name: npm-proxy-config
   
-"data": 
+data: 
   PROXY_REGISTRY_URI: {{ .Values.PROXY_REGISTRY_URI | quote }}
   PROXY_REGISTRY_HOST: {{ .Values.PROXY_REGISTRY_HOST | quote }}
   OIDC_ISSUER_URL: {{ .Values.OIDC_ISSUER_URL | quote }}

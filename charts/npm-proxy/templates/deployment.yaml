@@ -1,38 +1,38 @@
-"apiVersion": "apps/v1"
-"kind": "deployment"
-"metadata": 
-  "name": "npm-proxy"
+apiVersion: apps/v1
+kind: deployment
+metadata: 
+  name: npm-proxy
   
-"spec": 
-  "replicas": 1
-  "selector": 
-    "matchLabels": 
-      "app": "npm-proxy"
+spec: 
+  replicas: 1
+  selector: 
+    matchLabels: 
+      app: npm-proxy
 
-  "template": 
-    "metadata": 
-      "labels": 
-        "app": "npm-proxy"
+  template: 
+    metadata: 
+      labels: 
+        app: npm-proxy
 
-    "spec": 
-      "containers":         
-        - "name": "npm-proxy"
-          "image": "ghcr.io/veto-party/npm-proxy:REPLACE-IMAGE"
-          "ports":
+    spec: 
+      containers:         
+        - name: npm-proxy
+          image: ghcr.io/veto-party/npm-proxy:REPLACE-IMAGE
+          ports:
             - 5000
           volumeMounts:
             - name: data
               mountPath: /opt/npm-proxy/cache
 
-          "resources":
-          "nodeSelector": 
-            "label": "npm-proxy"
+          resources:
+          nodeSelector: 
+            label: npm-proxy
 
-          "envFrom":
-          - "configMapRef":
-              "name": "npm-proxy-config"
-          - "secretRef":
-              "name": "npm-proxy-secret"
+          envFrom:
+          - configMapRef:
+              name: npm-proxy-config
+          - secretRef:
+              name: npm-proxy-secret
 
       volumes:
         - name: data
