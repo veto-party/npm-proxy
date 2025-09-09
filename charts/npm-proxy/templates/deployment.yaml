@@ -19,7 +19,7 @@ spec:
         - name: npm-proxy
           image: ghcr.io/veto-party/npm-proxy:REPLACE-IMAGE
           ports:
-            - 5000
+            - containerPort: 5000
           volumeMounts:
             - name: data
               mountPath: /opt/npm-proxy/cache
