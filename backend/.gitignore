@@ -1,0 +1,7 @@
+/target/
+/cache/
+node_modules
+/.env.local
+/.env
+
+/development/

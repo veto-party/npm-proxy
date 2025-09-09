@@ -1,0 +1,12 @@
+include:
+  - ./development/docker-compose.yaml
+services:
+  web:
+    build: .
+    environment:
+      REDIS_URI: redis://redis:6379
+      OIDC_CLIENT_ID: ${OIDC_CLIENT_ID}
+      OIDC_CLIENT_SECRET: ${OIDC_CLIENT_SECRET}
+      DEV: true
+    ports:
+      - 5000:5000
