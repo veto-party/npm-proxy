@@ -5,7 +5,7 @@ appVersion: REPLACE-TAG
 version: REPLACE-TAG
 
 dependencies:
-    - name: redis
+  - name: redis
     repository: https://charts.bitnami.com/bitnami
     alias: redis
     version: ^22.0.7
