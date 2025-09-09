@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState, type FunctionComponent, type MouseEvent, type PointerEvent } from "react";
+import { useCallback, useMemo, type FunctionComponent } from "react";
 import { client } from "../../api";
 import { useFastDelete } from "../../hook/useFastDelete";
 
