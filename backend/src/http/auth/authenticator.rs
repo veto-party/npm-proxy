@@ -5,7 +5,7 @@ use chrono::Duration;
 use openidconnect::{core::{CoreAuthenticationFlow, CoreClient, CoreProviderMetadata, CoreUserInfoClaims}, AccessToken, AuthorizationCode, ClientId, ClientSecret, CsrfToken, IssuerUrl, Nonce, OAuth2TokenResponse, PkceCodeChallenge, PkceCodeVerifier, RedirectUrl, Scope};
 use reqwest::{header, Client};
 
-use crate::{config::Config, domain::Tokens::Tokens, http::auth::{token::api::TokenApi, user::CurrentUser}};
+use crate::{config::Config, domain::Tokens::Tokens, http::auth::{token::api::TokenApi}};
 
 
 #[derive(Clone)]
@@ -71,23 +71,11 @@ impl Authenticator {
         return self.token.create_token(Tokens { refresh_token: response.refresh_token().unwrap().secret().to_string().clone(), access_token: response.access_token().secret().to_string().clone() }).await;
     }
 
-    async fn authorize(&self, str: &str) -> Option<CurrentUser> {
-        if let Ok(result) = self.client.user_info(AccessToken::new(str.to_string()), None) {
-            let resulting: Result<CoreUserInfoClaims, _> = result.request_async(&self.http_client).await;
-            
-            if let Ok(requested) = resulting {
-                let id = requested.subject().clone().to_string();
-
-                return Some(CurrentUser {
-                    id: id
-                });
-            }
-        }
-
-        return None;
+    async fn authorize(&self, str: &str) -> bool {
+        return self.token.verify_token(str.to_string()).await;
     }
 
-    pub async fn middleware(&self, mut req: Request, next: Next) -> Result<Response, StatusCode> {
+    pub async fn middleware(&self, req: Request, next: Next) -> Result<Response, StatusCode> {
         let mut auth_header = req
                 .headers()
                 .get(header::AUTHORIZATION)
@@ -100,9 +88,8 @@ impl Authenticator {
             }
 
             auth_header = auth_header.trim().to_string();
-
-            if let Some(user) = self.authorize(&auth_header).await {
-                req.extensions_mut().insert(user);
+            
+            if  self.authorize(&auth_header).await {
                 return Ok(next.run(req).await);
             }
 
