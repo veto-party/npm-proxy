@@ -11,4 +11,4 @@ apiVersion": "gateway.networking.k8s.io/v1"
       "port": 8080
       
   "hostnames": 
-    - "{{ .Values.global.host.domain }}"
+    - "{{ .Values.host.domain }}"

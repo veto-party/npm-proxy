@@ -3,3 +3,9 @@ name: npm-registry
 
 appVersion: REPLACE-TAG
 version: REPLACE-TAG
+
+dependencies:
+    - name: redis
+    repository: https://charts.bitnami.com/bitnami
+    alias: redis
+    version: ^22.0.7

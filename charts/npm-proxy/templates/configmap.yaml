@@ -4,8 +4,9 @@
   "name": "npm-proxy-config"
   
 "data": 
-  PROXY_REGISTRY_URI: {{ .values.global.PROXY_REGISTRY_URI | quote }}
-  PROXY_REGISTRY_HOST: {{ .values.global.PROXY_REGISTRY_HOST | quote }}
-  OIDC_ISSUER_URL: {{ .values.global.OIDC_ISSUER_URL | quote }}
-  OIDC_CLIENT_ID: {{ .values.global.OIDC_CLIENT_ID | quote }}
-  OIDC_REDIRECT_URL: {{ .values.global.OIDC_REDIRECT_URL | quote }}
+  PROXY_REGISTRY_URI: {{ .Values.PROXY_REGISTRY_URI | quote }}
+  PROXY_REGISTRY_HOST: {{ .Values.PROXY_REGISTRY_HOST | quote }}
+  OIDC_ISSUER_URL: {{ .Values.OIDC_ISSUER_URL | quote }}
+  OIDC_CLIENT_ID: {{ .Values.OIDC_CLIENT_ID | quote }}
+  OIDC_REDIRECT_URL: {{ .Values.OIDC_REDIRECT_URL | quote }}
+  REDIS_URL: {{ .Values.REDIS_URL | quote }}
