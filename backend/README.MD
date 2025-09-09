@@ -11,3 +11,5 @@ Auth using OpenID Connect.
 - `OIDC_CLIENT_ID`
 - `OIDC_CLIENT_SECRET`
 - `OIDC_REDIRECT_URL`
+- `REDIS_URI`
+- `DEV`

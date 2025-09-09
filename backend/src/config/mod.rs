@@ -8,6 +8,7 @@ pub struct Config {
     pub oidc_client_secret: String,
     pub oidc_client_id: String,
     pub redis_uri: String,
+    pub dev: bool
 }
 
 impl Config {
@@ -18,7 +19,8 @@ impl Config {
             oidc_url:  env::var("OIDC_ISSUER_URL").unwrap_or("https://gitlab.git.veto.dev".to_string()),
             oidc_client_secret: env::var("OIDC_CLIENT_ID").unwrap_or("some-id".to_string()),
             oidc_client_id: env::var("OIDC_CLIENT_SECRET").unwrap_or("some-secret".to_string()),
-            redis_uri: env::var("REDIS_URI").unwrap_or("redis://localhost:6379".to_string())
+            redis_uri: env::var("REDIS_URI").unwrap_or("redis://localhost:6379".to_string()),
+            dev: env::var("DEV").unwrap_or("false".to_string()).as_str().parse().unwrap()
         }
     }
 }

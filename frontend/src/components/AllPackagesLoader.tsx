@@ -67,7 +67,7 @@ export const AllPackagesLoader: FunctionComponent = () => {
     }, [ packages ]);
 
     return <div className="flex flex-col gap-y-6">
-        <input value={search} onChange={e => setSearch(e.target.value)} type="text" placeholder="filter packages..." />
+        <input value={search} className="bg-gray-400 rounded-3xl" onChange={e => setSearch(e.target.value)} type="text" placeholder="filter packages..." />
         {packageGroups.sort(([a], [b]) => a.localeCompare(b)).map(([pgkName, metadatas]) => (
             <TreeNode packageName={pgkName} packageNames={metadatas}>
                 {metadatas.sort().map((packageName) => <ConfirmDeleteButton key={packageName} packageName={packageName}/>)}

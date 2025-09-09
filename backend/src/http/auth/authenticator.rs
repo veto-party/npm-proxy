@@ -1,15 +1,16 @@
 use std::env;
 
 use axum::{extract::Request, http::StatusCode, middleware::Next, response::Response, routing::get, Router};
+use chrono::Duration;
 use openidconnect::{core::{CoreAuthenticationFlow, CoreClient, CoreProviderMetadata, CoreUserInfoClaims}, AccessToken, AuthorizationCode, ClientId, ClientSecret, CsrfToken, IssuerUrl, Nonce, OAuth2TokenResponse, PkceCodeChallenge, PkceCodeVerifier, RedirectUrl, Scope};
 use reqwest::{header, Client};
-use serde::{Deserialize, Serialize};
 
-use crate::{config::Config, http::auth::user::CurrentUser};
+use crate::{config::Config, domain::Tokens::Tokens, http::auth::{token::api::TokenApi, user::CurrentUser}};
 
 
 #[derive(Clone)]
 pub struct Authenticator {
+    token: TokenApi,
     http_client: Client,
     client:  openidconnect::Client<openidconnect::EmptyAdditionalClaims, openidconnect::core::CoreAuthDisplay, openidconnect::core::CoreGenderClaim, openidconnect::core::CoreJweContentEncryptionAlgorithm, openidconnect::core::CoreJsonWebKey, openidconnect::core::CoreAuthPrompt, openidconnect::StandardErrorResponse<openidconnect::core::CoreErrorResponseType>, openidconnect::StandardTokenResponse<openidconnect::IdTokenFields<openidconnect::EmptyAdditionalClaims, openidconnect::EmptyExtraTokenFields, openidconnect::core::CoreGenderClaim, openidconnect::core::CoreJweContentEncryptionAlgorithm, openidconnect::core::CoreJwsSigningAlgorithm>, openidconnect::core::CoreTokenType>, openidconnect::StandardTokenIntrospectionResponse<openidconnect::EmptyExtraTokenFields, openidconnect::core::CoreTokenType>, openidconnect::core::CoreRevocableToken, openidconnect::StandardErrorResponse<openidconnect::RevocationErrorResponseType>, openidconnect::EndpointSet, openidconnect::EndpointNotSet, openidconnect::EndpointNotSet, openidconnect::EndpointNotSet, openidconnect::EndpointMaybeSet, openidconnect::EndpointMaybeSet>,
     self_url: String
@@ -17,7 +18,7 @@ pub struct Authenticator {
 
 impl Authenticator {
 
-    pub async fn create(config: &Config) -> Self {
+    pub async fn create(config: &Config, redis: redis::Client, duration: Duration) -> Self {
         let http_client = Client::builder().redirect(reqwest::redirect::Policy::none()).build().unwrap();
         let provider_metadata = CoreProviderMetadata::discover_async(
             IssuerUrl::new(config.oidc_url.clone()).unwrap(),
@@ -36,6 +37,7 @@ impl Authenticator {
             http_client:  http_client,
             client: client,
             self_url: config.self_url.clone(),
+            token: TokenApi::new(redis, duration).await
         }
     }
     
@@ -56,17 +58,17 @@ impl Authenticator {
             .url());
     }
 
-    pub async fn get_from_redirected(&self, token: String, csrf: String) -> AccessToken {
+    pub async fn get_from_redirected(&self, token: String, csrf: String) -> String {
 
         // let pkce_verifier = PkceCodeVerifier::new(csrf);
 
-        let token_response =self.client
+        let response = self.client
         .exchange_code(AuthorizationCode::new(token)).unwrap()
         // Set the PKCE code verifier.
         // .set_pkce_verifier(pkce_verifier)
         .request_async(&self.http_client).await.unwrap();
 
-        return token_response.access_token().clone();
+        return self.token.create_token(Tokens { refresh_token: response.refresh_token().unwrap().secret().to_string().clone(), access_token: response.access_token().secret().to_string().clone() }).await;
     }
 
     async fn authorize(&self, str: &str) -> Option<CurrentUser> {
