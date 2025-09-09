@@ -55,8 +55,10 @@ jobs:
                 TAGS: ${{ steps.meta.outputs.tags }}
                 DIGEST: ${{ steps.build-and-push.outputs.digest }}
               run: echo "${TAGS}" | xargs -I {} cosign sign --yes {}@${DIGEST}
-            - name: set image tag
-              run: sed -i "s|REPLACE-IMAGE|${{ github.event.release.tag_name }}|g" charts/npm-proxy/templates/deployment.yaml
+            - name: set tag
+              run: |
+               sed -i "s|REPLACE-IMAGE|${{ github.event.release.tag_name }}|g" charts/npm-proxy/templates/deployment.yaml
+               sed -i "s|REPLACE-TAG|${{ github.event.release.tag_name }}|g" charts/npm-proxy/Chart.yaml
             - name: Run chart-releaser
               uses: helm/chart-releaser-action@v1
               env:
