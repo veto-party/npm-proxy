@@ -1,4 +1,4 @@
-use std::{collections::HashMap, env, path, sync::Arc};
+use std::{collections::HashMap, path, sync::Arc};
 
 use axum::{extract::{Path, State}, routing::{delete, get}, Json, Router};
 use serde_json::json;

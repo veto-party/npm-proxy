@@ -1,8 +1,8 @@
 use std::env;
 
-use axum::{extract::Request, http::StatusCode, middleware::Next, response::Response, routing::get, Router};
+use axum::{extract::Request, http::StatusCode, middleware::Next, response::Response};
 use chrono::Duration;
-use openidconnect::{core::{CoreAuthenticationFlow, CoreClient, CoreProviderMetadata, CoreUserInfoClaims}, AccessToken, AuthorizationCode, ClientId, ClientSecret, CsrfToken, IssuerUrl, Nonce, OAuth2TokenResponse, PkceCodeChallenge, PkceCodeVerifier, RedirectUrl, Scope};
+use openidconnect::{core::{CoreAuthenticationFlow, CoreClient, CoreProviderMetadata}, AuthorizationCode, ClientId, ClientSecret, CsrfToken, IssuerUrl, Nonce, OAuth2TokenResponse, PkceCodeChallenge, PkceCodeVerifier, RedirectUrl, Scope};
 use reqwest::{header, Client};
 
 use crate::{config::Config, domain::Tokens::Tokens, http::auth::{token::api::TokenApi}};

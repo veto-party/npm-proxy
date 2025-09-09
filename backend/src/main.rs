@@ -18,7 +18,7 @@ use tower_http::cors::{Any, CorsLayer};
 use tower_http::services::ServeDir;
 
 use crate::http::api::api_routes;
-use crate::http::auth::api::{self, AuthenticatorApi};
+use crate::http::auth::api::AuthenticatorApi;
 use crate::http::auth::authenticator::Authenticator;
 
 #[tokio::main]

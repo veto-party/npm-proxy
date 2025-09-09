@@ -1,11 +1,10 @@
-use std::{collections::HashMap, hash::Hash, ops::Add, sync::Arc, time::Instant};
+use std::{collections::HashMap, sync::Arc, time::Instant};
 
 use chrono::{Duration};
 use redis::Commands;
 use tokio::{sync::RwLock};
 use tokio_schedule::Job;
 
-use crate::http::auth::token;
 
 
 #[derive(Clone)]
@@ -28,7 +27,7 @@ impl TokenCache {
 
         tokio_schedule::every(5).second().perform(async move || {
             references.cleanup().await;
-        });
+        }).await;
 
         return element;
     }
