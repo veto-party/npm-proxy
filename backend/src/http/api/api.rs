@@ -77,7 +77,7 @@ impl Api {
         let mut path = self.api_inner.cache.clone();
         path.push(BASE64_STANDARD.encode(package_name) + ".bin");
 
-        fs::remove_file(path).await;
+        fs::remove_file(path).await.unwrap();
     }
 
     pub async fn get_package_metadata(&mut self, package_name: String) -> Result<ApiStorage, ()> {
