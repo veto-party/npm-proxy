@@ -70,7 +70,7 @@ const RequestSession: FunctionComponent<PropsWithChildren> = ({
 
     if (!done) {
         return <div>
-            <a href={result?.loginUrl} target="_blank">Login: with oidc</a>
+            <a href={result?.loginUrl} target="_blank" rel="noopener noreferrer">Login: with oidc</a>
         </div>
     }
 
