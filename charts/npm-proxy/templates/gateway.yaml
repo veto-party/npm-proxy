@@ -11,4 +11,4 @@ spec:
       port: 8080
       
   hostnames: 
-    - "{{ .Values.host.domain }}""
+    - "{{ .Values.host.domain | quote }}
