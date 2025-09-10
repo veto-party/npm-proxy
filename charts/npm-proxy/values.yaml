@@ -1,12 +1,9 @@
-global:
-  host:
-    domain: npm.staging.veto.dev
-  PROXY_REGISTRY_URI: https://registry.npmjs.org/
-  PROXY_REGISTRY_HOST: https://npm.staging.veto.dev/
-  OIDC_ISSUER_URL: https://gitlab.git.veto.dev
-  OIDC_REDIRECT_URL: https://npm.staging.veto.dev/
-  OIDC_CLIENT_ID: <id>
-  OIDC_CLIENT_SECRET: <secret>
-  REDIS_URL: redis://redis.svc.cluster.local
-redis:
-  architecture: standalone
+host:
+  domain: "npm.staging.veto.dev"
+PROXY_REGISTRY_URI: "https://registry.npmjs.org/"
+PROXY_REGISTRY_HOST: "https://npm.staging.veto.dev/"
+OIDC_ISSUER_URL: "https://gitlab.git.veto.dev"
+OIDC_REDIRECT_URL: "https://npm.staging.veto.dev/"
+OIDC_CLIENT_ID: "<id>"
+OIDC_CLIENT_SECRET: "<secret>"
+REDIS_URL: "redis://cache-headless:6379"

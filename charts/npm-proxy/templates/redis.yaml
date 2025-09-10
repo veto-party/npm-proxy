@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata: 
+  name: npm-proxy-redis
+  
+spec:
+  replicas: 1
+  selector: 
+    matchLabels: 
+      app: npm-proxy-redis
+
+  template: 
+    metadata: 
+      labels: 
+        app: npm-proxy-redis
+
+    spec: 
+      containers:         
+        - name: npm-proxy
+          image: redis:8.2
+          ports:
+            - containerPort: 6379
+          volumeMounts:
+            - name: data
+              mountPath: /data
+
+          resources:
+
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: npm-proxy-redis-pvc
