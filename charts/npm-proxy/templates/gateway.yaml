@@ -11,6 +11,6 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: npm-registry-service
+                name: npm-proxy-service
                 port:
                   number: 5000
