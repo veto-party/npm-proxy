@@ -2,6 +2,19 @@ apiVersion: v1
 entries:
   npm-registry:
   - apiVersion: v2
+    appVersion: 0.0.17
+    created: "2025-09-10T14:47:34.197875164Z"
+    dependencies:
+    - alias: redis
+      name: redis
+      repository: https://charts.bitnami.com/bitnami
+      version: ^22.0.7
+    digest: 46a1365d3ca1d15959b91980ed08c70c18e27897c0a413f7c4f3e2b569f590e9
+    name: npm-registry
+    urls:
+    - https://github.com/veto-party/npm-proxy/releases/download/npm-registry-0.0.17/npm-registry-0.0.17.tgz
+    version: 0.0.17
+  - apiVersion: v2
     appVersion: 0.0.16
     created: "2025-09-10T14:31:43.845579105Z"
     dependencies:
@@ -121,4 +134,4 @@ entries:
     urls:
     - https://github.com/veto-party/npm-proxy/releases/download/npm-registry-0.0.0/npm-registry-0.0.0.tgz
     version: 0.0.0
-generated: "2025-09-10T14:31:43.84562406Z"
+generated: "2025-09-10T14:47:34.197922772Z"
