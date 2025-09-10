@@ -1,13 +1,13 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata: 
-  name: npm-proxy-deployment
+  app: npm-proxy-deployment
   
 spec: 
   replicas: 1
   selector: 
     matchLabels: 
-      app: npm-proxy-deployment
+      app: npm-proxy
 
   template: 
     metadata: 
