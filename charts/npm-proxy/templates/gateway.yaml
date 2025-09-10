@@ -13,4 +13,4 @@ spec:
               service:
                 name: npm-registry-service
                 port:
-                  number: 8080
+                  number: 5000

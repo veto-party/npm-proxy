@@ -5,7 +5,7 @@ metadata:
   
 spec: 
   selector: 
-    name: npm-registry-deployment
+    name: npm-proxy
     
   type: ClusterIP
   ports: 

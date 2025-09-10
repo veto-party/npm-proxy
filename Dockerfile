@@ -31,4 +31,6 @@ COPY --from=front_builder /usr/src/frontend/dist ./public
 
 RUN mkdir ./cache
 
+EXPOSE 5000
+
 CMD ["npm-proxy"]
