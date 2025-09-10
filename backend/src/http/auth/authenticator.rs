@@ -1,7 +1,6 @@
-use std::env;
+use std::time::Duration;
 
 use axum::{extract::Request, http::StatusCode, middleware::Next, response::Response};
-use chrono::Duration;
 use openidconnect::{core::{CoreAuthenticationFlow, CoreClient, CoreProviderMetadata}, AuthorizationCode, ClientId, ClientSecret, CsrfToken, IssuerUrl, Nonce, OAuth2TokenResponse, PkceCodeChallenge, PkceCodeVerifier, RedirectUrl, Scope};
 use reqwest::{header, Client};
 
@@ -31,7 +30,7 @@ impl Authenticator {
             ClientId::new(config.oidc_client_secret.clone()),
             Some(ClientSecret::new(config.oidc_client_id.clone())),
         )
-        .set_redirect_uri(RedirectUrl::new(env::var("OIDC_REDIRECT_URL").unwrap_or("http://localhost:5000/".to_string())).unwrap());
+        .set_redirect_uri(RedirectUrl::new(config.self_url.clone()).unwrap());
 
         return Authenticator {
             http_client:  http_client,

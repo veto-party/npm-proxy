@@ -30,7 +30,8 @@ async fn main() {
 
     let redis = redis::Client::open(conf.redis_uri.clone()).unwrap();
 
-    let auth = Authenticator::create(&conf, redis.clone(), Duration::minutes(2)).await;
+    println!("Discovery of oidc");
+    let auth = Authenticator::create(&conf, redis.clone(), Duration::minutes(2).to_std().unwrap()).await;
 
     let api = AuthenticatorApi::new(conf.self_url.clone(), redis.clone(), auth.clone());
 
@@ -68,6 +69,7 @@ async fn main() {
 
         app = app.nest_service("/ui", frontend);
 
+        println!("Starting app on port: 5000");
     let listener = tokio::net::TcpListener::bind("0.0.0.0:5000").await.unwrap();
     axum::serve(listener, app).await.unwrap();
 }

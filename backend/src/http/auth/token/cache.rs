@@ -1,10 +1,7 @@
-use std::{collections::HashMap, sync::Arc, time::Instant};
+use std::{collections::HashMap, sync::Arc, time::{Duration, Instant}};
 
-use chrono::{Duration};
 use redis::Commands;
-use tokio::{sync::RwLock};
-use tokio_schedule::Job;
-
+use tokio::sync::RwLock;
 
 
 #[derive(Clone)]
@@ -16,18 +13,18 @@ pub struct TokenCache {
 
 impl TokenCache {
 
-    pub async fn new(redis: redis::Client, cache_duration: Duration) -> Self {
-        let element = Self{
+    pub async fn new(redis: redis::Client, cache_duration: Duration) -> Arc<Self> {
+        let element = Arc::new(Self{
             cache_duration,
             cached: Arc::new(RwLock::new(HashMap::new())),
             redis
-        };
+        });
 
-        let references = &element;
-
-        tokio_schedule::every(5).second().perform(async move || {
-            references.cleanup().await;
-        }).await;
+         let element_clone = Arc::clone(&element);
+        tokio::spawn(async move {
+            element_clone.cleanup().await;
+            tokio::time::interval(cache_duration.clone()).tick().await
+        });
 
         return element;
     }
@@ -51,7 +48,7 @@ impl TokenCache {
     }
 
     pub async fn cleanup(&self) {
-        let cache_duration = self.cache_duration.to_std().unwrap();
+        let cache_duration = self.cache_duration;
         let mut map =self.cached.write().await;
         let to_remove = map.clone().into_iter().filter(|(_, k)| {
             return k.elapsed() > cache_duration

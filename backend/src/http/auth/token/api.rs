@@ -1,4 +1,5 @@
-use chrono::Duration;
+use std::{sync::Arc, time::Duration};
+
 use rand::{distr::Alphanumeric, rng, Rng};
 
 use crate::{domain::Tokens::Tokens, http::auth::token::cache::TokenCache};
@@ -6,7 +7,7 @@ use crate::{domain::Tokens::Tokens, http::auth::token::cache::TokenCache};
 
 #[derive(Clone)]
 pub struct TokenApi {
-    cache: TokenCache,
+    cache: Arc<TokenCache>,
 }
 
 impl TokenApi {
