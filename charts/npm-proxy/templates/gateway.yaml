@@ -3,6 +3,7 @@ kind: Ingress
 metadata:
   name: npm-proxy-ingress
 spec:
+  ingressClassName: traefik
   rules:
     - host: {{ .Values.host.domain | quote }}
       http:
