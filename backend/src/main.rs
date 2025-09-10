@@ -47,7 +47,7 @@ async fn main() {
             return Redirect::temporary("/ui/").into_response();
         }))
         .route_layer(middleware::from_fn_with_state((auth.clone(), api.clone()), |State((state, api)): State<(Authenticator, AuthenticatorApi)>, Query(params):Query<HashMap<String, String>>, jar: CookieJar, req: Request, next: Next| async move  {
-            if req.uri().path().eq("/")  {
+            if req.uri().path().eq("/") && params.contains_key("code")  {
                 let token = state.get_from_redirected(params.get("code").unwrap().clone(), jar.get("_csrf").unwrap().to_string()).await;
                 if params.contains_key("state") {
                     let _ = api.unlock(params.get("state").unwrap().to_string(), token).await;
