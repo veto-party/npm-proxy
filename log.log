@@ -1,1 +1,0 @@
-time="2025-09-10T16:25:37Z" level=error msg="Skipping service: no endpoints found" servicePort="&ServiceBackendPort{Name:,Number:5000,}" ingress=npm-proxy-ingress namespace=npm-proxy providerName=kubernetes serviceName=npm-proxy-service
