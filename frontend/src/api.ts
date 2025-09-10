@@ -1,5 +1,5 @@
 import axios from 'axios';
 
 export const client = axios.create({
-    baseURL: 'http://localhost:5000'
+    baseURL: import.meta.env.DEV ? 'http://localhost:5000' : '/'
 });
