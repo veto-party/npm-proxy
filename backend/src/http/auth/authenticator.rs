@@ -9,7 +9,7 @@ use crate::{config::Config, domain::Tokens::Tokens, http::auth::{token::api::Tok
 
 #[derive(Clone)]
 pub struct Authenticator {
-    token: TokenApi,
+    pub token: TokenApi,
     http_client: Client,
     client:  openidconnect::Client<openidconnect::EmptyAdditionalClaims, openidconnect::core::CoreAuthDisplay, openidconnect::core::CoreGenderClaim, openidconnect::core::CoreJweContentEncryptionAlgorithm, openidconnect::core::CoreJsonWebKey, openidconnect::core::CoreAuthPrompt, openidconnect::StandardErrorResponse<openidconnect::core::CoreErrorResponseType>, openidconnect::StandardTokenResponse<openidconnect::IdTokenFields<openidconnect::EmptyAdditionalClaims, openidconnect::EmptyExtraTokenFields, openidconnect::core::CoreGenderClaim, openidconnect::core::CoreJweContentEncryptionAlgorithm, openidconnect::core::CoreJwsSigningAlgorithm>, openidconnect::core::CoreTokenType>, openidconnect::StandardTokenIntrospectionResponse<openidconnect::EmptyExtraTokenFields, openidconnect::core::CoreTokenType>, openidconnect::core::CoreRevocableToken, openidconnect::StandardErrorResponse<openidconnect::RevocationErrorResponseType>, openidconnect::EndpointSet, openidconnect::EndpointNotSet, openidconnect::EndpointNotSet, openidconnect::EndpointNotSet, openidconnect::EndpointMaybeSet, openidconnect::EndpointMaybeSet>,
     self_url: String
@@ -55,6 +55,19 @@ impl Authenticator {
             // Set the PKCE code challenge.
             //.set_pkce_challenge(pkce_challenge)
             .url());
+    }
+
+    pub async fn get_from_redirected_only_token(&self, token: String) -> String {
+
+        // let pkce_verifier = PkceCodeVerifier::new(csrf);
+
+        let response = self.client
+        .exchange_code(AuthorizationCode::new(token)).unwrap()
+        // Set the PKCE code verifier.
+        // .set_pkce_verifier(pkce_verifier)
+        .request_async(&self.http_client).await.unwrap();
+
+        return self.token.create_token(Tokens { refresh_token: response.refresh_token().unwrap().secret().to_string().clone(), access_token: response.access_token().secret().to_string().clone() }).await;
     }
 
     pub async fn get_from_redirected(&self, token: String, csrf: String) -> String {

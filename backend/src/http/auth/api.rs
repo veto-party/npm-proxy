@@ -6,20 +6,20 @@ use redis::{Commands};
 use serde::{Deserialize, Serialize};
 use serde_json::{json};
 
-use crate::http::auth::authenticator::Authenticator;
-
-#[derive(Clone)]
-pub struct AuthenticatorApi {
-    self_url: String,
-    redis: redis::Client,
-    authenticator: Authenticator,
-}
+use crate::http::auth::{authenticator::Authenticator, token::cache::TokenCache};
 
 #[derive(Deserialize, Serialize, redis_macros::FromRedisValue, redis_macros::ToRedisArgs)]
 enum AuthenticatorStatus {
     Empty(),
     Stored(String),
     Unknown()
+}
+
+#[derive(Clone)]
+pub struct AuthenticatorApi {
+    self_url: String,
+    redis: redis::Client,
+    authenticator: Authenticator
 }
 
 impl AuthenticatorApi {
@@ -138,6 +138,18 @@ impl AuthenticatorApi {
                 }
 
                 return Err(());
+            }))
+        }
+
+        {
+            let authenticator = self.authenticator.clone();
+            resulting_router = resulting_router.route("/ci_token", get(async move |Query(all): Query<HashMap<String, String>>| {
+                let code = all.get("code").unwrap();
+
+                authenticator.get_from_redirected_only_token(code.clone()).await;
+                authenticator.token.cache.temp_token(code.clone()).await;
+
+                return Json(json!(code)).into_response();
             }))
         }
 

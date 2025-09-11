@@ -7,7 +7,7 @@ use crate::{domain::Tokens::Tokens, http::auth::token::cache::TokenCache};
 
 #[derive(Clone)]
 pub struct TokenApi {
-    cache: Arc<TokenCache>,
+    pub cache: Arc<TokenCache>,
 }
 
 impl TokenApi {

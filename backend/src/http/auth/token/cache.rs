@@ -29,6 +29,10 @@ impl TokenCache {
         return element;
     }
 
+    pub async fn temp_token(&self, token: String) {
+        self.cached.write().await.insert("token".to_string() + &token, Instant::now());
+    }
+
     pub async fn get_token_for_user(&self, token_to_check: String) -> bool {
         let mut exists = self.cached.read().await.contains_key(&token_to_check);
 
