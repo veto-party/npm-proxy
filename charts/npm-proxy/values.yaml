@@ -7,3 +7,7 @@ OIDC_REDIRECT_URL: "https://npm.staging.veto.dev/"
 OIDC_CLIENT_ID: "<id>"
 OIDC_CLIENT_SECRET: "<secret>"
 REDIS_URI: "redis://redis-service"
+
+ingress:
+  className: traefik
+
