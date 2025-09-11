@@ -9,4 +9,4 @@ data:
   OIDC_ISSUER_URL: {{ .Values.OIDC_ISSUER_URL | quote }}
   OIDC_CLIENT_ID: {{ .Values.OIDC_CLIENT_ID | quote }}
   OIDC_REDIRECT_URL: {{ .Values.OIDC_REDIRECT_URL | quote }}
-  REDIS_URL: {{ .Values.REDIS_URL | quote }}
+  REDIS_URI: {{ .Values.REDIS_URI | quote }}

@@ -1,10 +1,16 @@
 apiVersion: v1
 kind: Service
-metadata:
+metadata: 
   name: redis-service
-spec:
-  ports:
-    - port: 6379
-      name: redis
-  selector:
+  
+spec: 
+  selector: 
     app: npm-proxy-redis
+    
+  type: ClusterIP
+  ports: 
+    
+    - name: npm-registry-6379
+      protocol: TCP
+      port: 6379
+      targetPort: 6379
