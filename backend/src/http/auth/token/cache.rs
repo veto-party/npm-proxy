@@ -3,6 +3,8 @@ use std::{collections::HashMap, sync::Arc, time::{Duration, Instant}};
 use redis::Commands;
 use tokio::sync::RwLock;
 
+use crate::http::auth::token;
+
 
 #[derive(Clone)]
 pub struct TokenCache {
@@ -39,8 +41,10 @@ impl TokenCache {
         if !exists {
             exists = self.redis.get_connection().unwrap().get("token.".to_string() + &token_to_check).unwrap_or(false);
             if exists {
-                self.cached.write().await.insert(token_to_check, Instant::now());
+                self.cached.write().await.insert(token_to_check.clone(), Instant::now());
             }
+        } else {
+            self.cached.write().await.insert(token_to_check.clone(), Instant::now());
         }
 
         return exists;
