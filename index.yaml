@@ -2,6 +2,14 @@ apiVersion: v1
 entries:
   npm-registry:
   - apiVersion: v2
+    appVersion: 0.0.25
+    created: "2025-09-11T17:52:10.614394292Z"
+    digest: ec9da6cc87136bc3d4c66fbc7ee32b5f6252f19a00545007f465827f9f31cc39
+    name: npm-registry
+    urls:
+    - https://github.com/veto-party/npm-proxy/releases/download/npm-registry-0.0.25/npm-registry-0.0.25.tgz
+    version: 0.0.25
+  - apiVersion: v2
     appVersion: 0.0.24
     created: "2025-09-11T17:45:05.72779721Z"
     digest: 8946dc8e1ead852aeebab6524f14eea1b5a7d36f17e10805e33ce1fe86e2cd0c
@@ -215,4 +223,4 @@ entries:
     urls:
     - https://github.com/veto-party/npm-proxy/releases/download/npm-registry-0.0.0/npm-registry-0.0.0.tgz
     version: 0.0.0
-generated: "2025-09-11T17:45:05.727923937Z"
+generated: "2025-09-11T17:52:10.614508485Z"
