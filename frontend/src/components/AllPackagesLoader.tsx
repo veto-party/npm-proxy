@@ -24,9 +24,8 @@ export const AllPackagesLoader: FunctionComponent = () => {
     }, []));
 
     const searchTargets = useMemo(() => {
-        return rawPackages?.map(fuzzysort.prepare) ?? [];
+        return rawPackages?.map(decodeURIComponent)?.map(fuzzysort.prepare) ?? [];
     }, [ rawPackages ]);
-
 
     const packages = useMemo(() => {
         if (search.trim() === '') {
@@ -34,7 +33,7 @@ export const AllPackagesLoader: FunctionComponent = () => {
         }
 
         return fuzzysort.go(search, searchTargets, {
-            threshold: 0.8
+            threshold: 0
         }).map((r) => r.target);
     }, [search, rawPackages, searchTargets]);
 
@@ -73,7 +72,7 @@ export const AllPackagesLoader: FunctionComponent = () => {
     }, [ packages ]);
 
     return <div className="flex flex-col gap-y-6">
-        <input value={search} className="bg-gray-400 rounded-3xl" onChange={e => setSearch(e.target.value)} type="text" placeholder="filter packages..." />
+        <input value={search} className="bg-gray-400 rounded-3xl mx-4" onChange={e => setSearch(e.target.value)} type="text" placeholder="filter packages..." />
         {packageGroups.map(([pgkName, metadatas]) => (
             <TreeNode packageName={pgkName} packageNames={metadatas}>
                 {metadatas.sort().map((packageName) => <ConfirmDeleteButton key={packageName} packageName={packageName}/>)}
