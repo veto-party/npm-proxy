@@ -3,10 +3,11 @@ import { client } from "../api";
 import { ConfirmDeleteButton } from "./Tree/ConfirmDeleteButton";
 import { useLoaded } from "../hook/useLoaded";
 import { TreeNode } from "./Tree/TreeNode";
+import fuzzysort from "fuzzysort";
 
-const fuzzyMatch = (pattern: string): RegExp => {
-    return new RegExp(pattern.split("").map(s => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join(".*"), "i");
-}
+// const fuzzyMatch = (pattern: string): RegExp => {
+//     return new RegExp(pattern.split("").map(s => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join(".*"), "i");
+// }
 
 export const AllPackagesLoader: FunctionComponent = () => {
     
@@ -22,15 +23,20 @@ export const AllPackagesLoader: FunctionComponent = () => {
         }
     }, []));
 
-    const regex = useMemo(() => fuzzyMatch(encodeURIComponent(search)), [search]);
+    const searchTargets = useMemo(() => {
+        return rawPackages?.map(fuzzysort.prepare) ?? [];
+    }, [ rawPackages ]);
+
 
     const packages = useMemo(() => {
         if (search.trim() === '') {
             return rawPackages;
         }
 
-        return rawPackages?.filter(regex.test.bind(regex));
-    }, [search, regex, rawPackages])
+        return fuzzysort.go(search, searchTargets, {
+            threshold: 0.8
+        }).map((r) => r.target);
+    }, [search, rawPackages, searchTargets]);
 
     const packageGroups = useMemo(() => {
         if (!packages) {
@@ -68,7 +74,7 @@ export const AllPackagesLoader: FunctionComponent = () => {
 
     return <div className="flex flex-col gap-y-6">
         <input value={search} className="bg-gray-400 rounded-3xl" onChange={e => setSearch(e.target.value)} type="text" placeholder="filter packages..." />
-        {packageGroups.sort(([a], [b]) => a.localeCompare(b)).map(([pgkName, metadatas]) => (
+        {packageGroups.map(([pgkName, metadatas]) => (
             <TreeNode packageName={pgkName} packageNames={metadatas}>
                 {metadatas.sort().map((packageName) => <ConfirmDeleteButton key={packageName} packageName={packageName}/>)}
             </TreeNode>
