@@ -10,18 +10,18 @@
   },
   "dependencies": {
     "axios": "^1.11.0",
+    "fuzzysort": "^3.1.0",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
-    "react-error-boundary": "^6.0.0",
-    "fuzzysort": "^3.1.0"
+    "react-error-boundary": "^6.0.0"
   },
   "devDependencies": {
+    "@tailwindcss/vite": "^4.1.13",
     "@types/react": "^19.1.10",
     "@types/react-dom": "^19.1.7",
     "@vitejs/plugin-react": "^5.0.0",
-    "@tailwindcss/vite": "^4.1.13",
+    "tailwindcss": "^4.1.13",
     "typescript": "~5.8.3",
-    "vite": "^7.1.2",
-    "tailwindcss": "^4.1.13"
+    "vite": "^7.1.2"
   }
 }

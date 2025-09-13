@@ -24,22 +24,26 @@ export const AllPackagesLoader: FunctionComponent = () => {
     }, []));
 
     const searchTargets = useMemo(() => {
-        return rawPackages?.map(decodeURIComponent)?.map(fuzzysort.prepare) ?? [];
+        return Object.fromEntries(rawPackages?.map((prev) => [prev, fuzzysort.prepare(decodeURIComponent(prev))] as const) ?? []);
     }, [ rawPackages ]);
+
+    const searchTargetsInverse = useMemo(() => {
+        return Object.fromEntries(rawPackages?.map((prev) => [decodeURIComponent(prev), prev] as const) ?? []);
+    }, [ searchTargets ]);
 
     const packages = useMemo(() => {
         if (search.trim() === '') {
             return rawPackages;
         }
 
-        return fuzzysort.go(search, searchTargets, {
+        return fuzzysort.go(search, Object.values(searchTargets), {
             threshold: 0
-        }).map((r) => r.target);
-    }, [search, rawPackages, searchTargets]);
+        }).map((r) => searchTargetsInverse[r.target]);
+    }, [search, rawPackages, searchTargets, searchTargetsInverse]);
 
     const packageGroups = useMemo(() => {
         if (!packages) {
-            return [];
+            return {};
         }
 
         const counters: Record<string, number> = {};
@@ -47,15 +51,20 @@ export const AllPackagesLoader: FunctionComponent = () => {
 
         for (const pkgName of packages) {
 
-            results[pkgName] ??= [];
+            results[pkgName] ??= [pkgName];
 
             for (const subPkgName of packages) {
+
+                if (pkgName == subPkgName) {
+                    continue;
+                }
+
                 if (!subPkgName.startsWith(pkgName)) {
                     continue;
                 }
 
                 const sub = subPkgName.substring(pkgName.length);
-                if (!sub.startsWith('/') && !sub.startsWith(encodeURI('/'))) {
+                if (!sub.startsWith('/')) {
                     continue;
                 }
 
@@ -68,13 +77,15 @@ export const AllPackagesLoader: FunctionComponent = () => {
             delete results[key];
         }
 
-        return Object.entries(results);
+        return results;
     }, [ packages ]);
+
+    const all = useMemo(() => Object.entries(packageGroups), [ packageGroups ])
 
     return <div className="flex flex-col gap-y-6">
         <input value={search} className="bg-gray-400 rounded-3xl mx-4" onChange={e => setSearch(e.target.value)} type="text" placeholder="filter packages..." />
-        {packageGroups.map(([pgkName, metadatas]) => (
-            <TreeNode packageName={pgkName} packageNames={metadatas}>
+        {all.map(([pgkName, metadatas]) => (
+            <TreeNode packageName={pgkName} packageNames={metadatas} all={rawPackages ?? []}>
                 {metadatas.sort().map((packageName) => <ConfirmDeleteButton key={packageName} packageName={packageName}/>)}
             </TreeNode>
         ))}

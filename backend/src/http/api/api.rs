@@ -75,7 +75,7 @@ impl Api {
 
     pub async fn delete_cached_file(&self, package_name: String) {
         let mut path = self.api_inner.cache.clone();
-        path.push(BASE64_STANDARD.encode(package_name) + ".bin");
+        path.push(BASE64_STANDARD.encode(urlencoding::encode(&package_name).to_string()) + ".bin");
 
         fs::remove_file(path).await.unwrap();
     }

@@ -51,16 +51,18 @@ impl ApiInner {
     fn modified(registry_uri: String, resulting_registry_uri: String, data: Vec<u8>) -> Vec<u8> {
         let mut datar = data.clone();
         let mut result: serde_json::Value = simd_json::serde::from_slice(&mut datar).unwrap();
-        let value = result.as_object_mut().unwrap().get_mut(&"versions".to_string()).unwrap().as_object_mut().unwrap().values_mut();
+        if (result.as_object().unwrap().contains_key("versions")) {
+            let value = result.as_object_mut().unwrap().get_mut(&"versions".to_string()).unwrap().as_object_mut().unwrap().values_mut();
 
-        for entry in value  {
+            for entry in value  {
 
-            let tarball = entry.as_object_mut().unwrap().get_mut(&"dist".to_string()).unwrap().as_object_mut().unwrap().get_mut(&"tarball".to_string()).unwrap();
-            if let Value::String(s) = tarball {
-                *s = s.replace(&registry_uri, &resulting_registry_uri);
+                let tarball = entry.as_object_mut().unwrap().get_mut(&"dist".to_string()).unwrap().as_object_mut().unwrap().get_mut(&"tarball".to_string()).unwrap();
+                if let Value::String(s) = tarball {
+                    *s = s.replace(&registry_uri, &resulting_registry_uri);
+                }
             }
         }
-
+        
         return simd_json::to_vec(&result).unwrap();
     }
 

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState, type FunctionComponent, type PropsWithChildren } from "react";
-import { client } from "../api";
+import { client, packageClient } from "../api";
 import { RetryErrorBoundary } from "./RetryBoundary";
 import { useLoaded } from "../hook/useLoaded";
 
@@ -16,6 +16,7 @@ const checkLoadingToken = () => {
     }
 
     client.defaults.headers.common.Authorization = `Bearer ${data}`;
+    packageClient.defaults.headers.common.Authorization = `Bearer ${data}`
     return true;
 }
 
@@ -58,6 +59,7 @@ const RequestSession: FunctionComponent<PropsWithChildren> = ({
             localStorage.setItem(STORE_TOKEN_DATA_KEY, response.data.token);
 
             client.defaults.headers.common.Authorization = `Bearer ${response.data.token}`;
+            packageClient.defaults.headers.common.Authorization = `Bearer ${response.data.token}`
 
             setDone(true);
         }, 1000);

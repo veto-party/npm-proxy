@@ -47,6 +47,7 @@ pub fn api_routes(router: Router, config: &Config) -> Router {
             }
         ).with_state(api_state.clone()))
         .route("/-/api/delete/{package_name}", delete(|Path(package_name): Path<String>, State(api): State<ApiState>| async move {
+            print!("{package_name}");
             api.api.delete_cached_file(package_name).await;
             return Json("{}");
         }).with_state(api_state.clone()))
